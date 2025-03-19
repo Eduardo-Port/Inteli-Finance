@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.List;
 
 @Service
@@ -134,17 +135,28 @@ public class StockService {
 
     public Double getValueBazinMethod(String title) {
         Stock stock = this.stockRepository.findById(title).orElseThrow(StockNotFoundException::new);
-        double dividendYieldDesired = 10.0;
-        DecimalFormat decimalFormat = new DecimalFormat("#,##");
+        double dividendYieldDesired = 5.0;
+        DecimalFormat decimalFormat = new DecimalFormat("#.00");
         Double value = (stock.getPrice() * stock.getDividendYieldLast5Years()) / dividendYieldDesired;
-        return Double.valueOf(decimalFormat.format(value));
+        String formattedValue = decimalFormat.format(value);
+        try {
+            return decimalFormat.parse(formattedValue).doubleValue();
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Double getValueGrahamMethod(String title) {
         Stock stock = this.stockRepository.findById(title).orElseThrow(StockNotFoundException::new);
         double fixValue = 22.5;
         Double value = Math.sqrt(fixValue * stock.getProfit() * stock.getPatrimonialValue());
-        DecimalFormat decimalFormat = new DecimalFormat("#,##");
-        return Double.valueOf(decimalFormat.format(value));
+        DecimalFormat decimalFormat = new DecimalFormat("#.00");
+        String formattedValue = decimalFormat.format(value);
+        try {
+            System.out.println(decimalFormat.parse(formattedValue).doubleValue());
+            return decimalFormat.parse(formattedValue).doubleValue();
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
