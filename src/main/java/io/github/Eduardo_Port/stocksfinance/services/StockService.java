@@ -6,16 +6,18 @@ import io.github.Eduardo_Port.stocksfinance.domain.stock.dto.StockInputDTO;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import io.github.Eduardo_Port.stocksfinance.domain.stock.exceptions.StockNotFoundException;
+import io.github.Eduardo_Port.stocksfinance.domain.stock.exceptions.StocksIsEqualException;
 import io.github.Eduardo_Port.stocksfinance.repositories.StockRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class StockService {
     private final StockRepository stockRepository;
-    private final int numberStocksApresented = 9;
 
     public StockService(StockRepository stockRepository) {
         this.stockRepository = stockRepository;
@@ -32,6 +34,7 @@ public class StockService {
 
     // getStocksPaginated creates an instance of the Pageable interface and passes it to the findAll method.
     public Page<Stock> getStocksPaginated(int page) {
+        int numberStocksApresented = 9;
         Pageable pageable = PageRequest.of(page, numberStocksApresented);
         Page<Stock> stocks = stockRepository.findAll(pageable);
         if(stocks.isEmpty()) {
@@ -93,5 +96,28 @@ public class StockService {
         }
         Stock stock = this.stockRepository.findById(title).orElseThrow(StockNotFoundException::new);
         this.stockRepository.delete(stock);
+    }
+
+    public Stock getBetterStockBazinMethod(List<String> stocksToCompare) {
+        List<Stock> stocks = this.stockRepository.findAllById(stocksToCompare);
+        Double bazinMethodValueFirstStock = getValueBazinMethod(stocks.get(0).getPrice(), stocks.get(0).getDividendYieldLast5Years());
+        Double bazinMethodvalueSecondStock = getValueBazinMethod(stocks.get(1).getPrice(), stocks.get(1).getDividendYieldLast5Years());
+        if(bazinMethodValueFirstStock > bazinMethodvalueSecondStock) {
+            return stocks.get(0);
+        } else if (bazinMethodValueFirstStock < bazinMethodvalueSecondStock) {
+            throw new StocksIsEqualException();
+        } else {
+            return stocks.get(1);
+        }
+    }
+
+    public Double getValueBazinMethod(Double price, Double dividendYield5Years) {
+        double dividendYieldDesired = 10.0;
+        return (price * dividendYield5Years) / dividendYieldDesired;
+    }
+
+    public Double getValueGrahamMethod(Double profit, Double patrimonialValue) {
+        double fixValue =  22.5;
+        return Math.sqrt(fixValue*profit*patrimonialValue);
     }
 }

@@ -2,15 +2,10 @@ package io.github.Eduardo_Port.stocksfinance.controller;
 
 import io.github.Eduardo_Port.stocksfinance.domain.stock.Stock;
 import io.github.Eduardo_Port.stocksfinance.domain.stock.dto.StockInputDTO;
-import io.github.Eduardo_Port.stocksfinance.domain.stock.dto.StockUpdateInputDTO;
 import io.github.Eduardo_Port.stocksfinance.services.StockService;
-import jakarta.websocket.server.PathParam;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +41,13 @@ public class StockController {
     public ResponseEntity<Stock> getStockByTitle(@RequestParam String title) {
         Stock stock = this.stockService.getStockByTitle(title);
         return ResponseEntity.ok().body(stock);
+    }
+
+    @GetMapping("/compare")
+    public ResponseEntity<Stock> getBetterStock(@RequestBody String titleFirstStock, String titleSecondStock) {
+        List<String> stocks = List.of(titleFirstStock, titleSecondStock);
+        Stock betterStock = stockService.getBetterStockBazinMethod(stocks);
+        return ResponseEntity.ok().body(betterStock);
     }
 
     @PutMapping()
