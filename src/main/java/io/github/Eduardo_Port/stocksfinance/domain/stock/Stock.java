@@ -15,6 +15,7 @@ public class Stock extends RepresentationModel<Stock> {
     private Double price;
     private Double profit;
     private Double pricePerPatrimonialValue;
+    private Double patrimonialValue;
     private Double dividendYield;
     private Double dividendYieldLast5Years;
 
@@ -27,6 +28,7 @@ public class Stock extends RepresentationModel<Stock> {
         this.price = stockData.price();
         this.profit = stockData.profit();
         this.pricePerPatrimonialValue = stockData.pricePerPatrimonialValue(); // P/VP
+        this.patrimonialValue = stockData.pricePerPatrimonialValue(); // VPA
         this.dividendYield = stockData.dividendYield(); // DY
         this.dividendYieldLast5Years = stockData.dividendYieldLast5Years(); // DY DOS ULTIMOS 5 ANOS
     }

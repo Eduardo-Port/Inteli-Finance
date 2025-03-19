@@ -3,8 +3,10 @@ package io.github.Eduardo_Port.stocksfinance.services;
 import io.github.Eduardo_Port.stocksfinance.controller.StockController;
 import io.github.Eduardo_Port.stocksfinance.domain.stock.Stock;
 import io.github.Eduardo_Port.stocksfinance.domain.stock.dto.StockInputDTO;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import io.github.Eduardo_Port.stocksfinance.domain.stock.exceptions.StockNotFoundException;
 import io.github.Eduardo_Port.stocksfinance.domain.stock.exceptions.StocksIsEqualException;
 import io.github.Eduardo_Port.stocksfinance.repositories.StockRepository;
@@ -37,9 +39,9 @@ public class StockService {
         int numberStocksApresented = 9;
         Pageable pageable = PageRequest.of(page, numberStocksApresented);
         Page<Stock> stocks = stockRepository.findAll(pageable);
-        if(stocks.isEmpty()) {
+        if (stocks.isEmpty()) {
             throw new StockNotFoundException();
-        } else{
+        } else {
             for (Stock stock : stocks) {
                 String title = stock.getTitle();
                 stock.add(linkTo(methodOn(StockController.class)
@@ -60,34 +62,38 @@ public class StockService {
     }
 
     public Stock update(StockInputDTO stockData) {
-            Stock stock = this.stockRepository.findById(stockData.title()).orElseThrow(StockNotFoundException::new);
-            if (stockData.price() != null && !stock.getPrice().equals(stockData.price())) {
-                stock.setPrice(stockData.price());
-            }
+        Stock stock = this.stockRepository.findById(stockData.title()).orElseThrow(StockNotFoundException::new);
+        if (stockData.price() != null && !stock.getPrice().equals(stockData.price())) {
+            stock.setPrice(stockData.price());
+        }
 
-            if (stockData.profit() != null && !stock.getProfit().equals(stockData.profit())) {
-                stock.setProfit(stockData.profit());
-            }
+        if (stockData.profit() != null && !stock.getProfit().equals(stockData.profit())) {
+            stock.setProfit(stockData.profit());
+        }
 
-            if (stockData.pricePerPatrimonialValue() != null && !stock.getPricePerPatrimonialValue()
-                    .equals(stockData.pricePerPatrimonialValue())) {
-                stock.setPricePerPatrimonialValue(stockData.pricePerPatrimonialValue());
-            }
+        if (stockData.patrimonialValue() != null) {
+            stock.setPatrimonialValue(stockData.patrimonialValue());
+        }
 
-            if (stockData.dividendYield() != null && !stock.getDividendYield()
-                    .equals(stockData.dividendYield())) {
-                stock.setDividendYield(stockData.dividendYield());
-            }
+        if (stockData.pricePerPatrimonialValue() != null && !stock.getPricePerPatrimonialValue()
+                .equals(stockData.pricePerPatrimonialValue())) {
+            stock.setPricePerPatrimonialValue(stockData.pricePerPatrimonialValue());
+        }
 
-            if (stockData.dividendYieldLast5Years() != null && !stock.getDividendYieldLast5Years()
-                    .equals(stockData.dividendYieldLast5Years())) {
-                stock.setDividendYieldLast5Years(stockData.dividendYieldLast5Years());
-            }
-            this.stockRepository.save(stock);
-            stock.add(linkTo(methodOn(StockController.class)
-                    .getStockByTitle(stockData.title()))
-                    .withSelfRel());
-            return stock;
+        if (stockData.dividendYield() != null && !stock.getDividendYield()
+                .equals(stockData.dividendYield())) {
+            stock.setDividendYield(stockData.dividendYield());
+        }
+
+        if (stockData.dividendYieldLast5Years() != null && !stock.getDividendYieldLast5Years()
+                .equals(stockData.dividendYieldLast5Years())) {
+            stock.setDividendYieldLast5Years(stockData.dividendYieldLast5Years());
+        }
+        this.stockRepository.save(stock);
+        stock.add(linkTo(methodOn(StockController.class)
+                .getStockByTitle(stockData.title()))
+                .withSelfRel());
+        return stock;
     }
 
     public void deleteByTitle(String title) {
@@ -102,14 +108,28 @@ public class StockService {
         List<Stock> stocks = this.stockRepository.findAllById(stocksToCompare);
         Double bazinMethodValueFirstStock = getValueBazinMethod(stocks.get(0).getPrice(), stocks.get(0).getDividendYieldLast5Years());
         Double bazinMethodvalueSecondStock = getValueBazinMethod(stocks.get(1).getPrice(), stocks.get(1).getDividendYieldLast5Years());
-        if(bazinMethodValueFirstStock > bazinMethodvalueSecondStock) {
+        if (bazinMethodValueFirstStock > bazinMethodvalueSecondStock) {
             return stocks.get(0);
         } else if (bazinMethodValueFirstStock < bazinMethodvalueSecondStock) {
+            return stocks.get(1);
+        } else {
+            throw new StocksIsEqualException();
+        }
+    }
+
+    public Stock getBetterStockGrahamMethod(List<String> stocksToCompare) {
+        List<Stock> stocks = this.stockRepository.findAllById(stocksToCompare);
+        Double grahamMethodValueFirstStock = getValueGrahamMethod(stocks.get(0).getProfit(), stocks.get(0).getPatrimonialValue());
+        Double grahamMethodValueSecondStock = getValueGrahamMethod(stocks.get(1).getProfit(), stocks.get(1).getPatrimonialValue());
+        if(grahamMethodValueFirstStock > grahamMethodValueSecondStock) {
+            return stocks.get(0);
+        } else if (grahamMethodValueFirstStock < grahamMethodValueSecondStock) {
             throw new StocksIsEqualException();
         } else {
             return stocks.get(1);
         }
     }
+
 
     public Double getValueBazinMethod(Double price, Double dividendYield5Years) {
         double dividendYieldDesired = 10.0;
@@ -117,7 +137,7 @@ public class StockService {
     }
 
     public Double getValueGrahamMethod(Double profit, Double patrimonialValue) {
-        double fixValue =  22.5;
-        return Math.sqrt(fixValue*profit*patrimonialValue);
+        double fixValue = 22.5;
+        return Math.sqrt(fixValue * profit * patrimonialValue);
     }
 }

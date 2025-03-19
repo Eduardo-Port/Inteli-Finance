@@ -43,12 +43,20 @@ public class StockController {
         return ResponseEntity.ok().body(stock);
     }
 
-    @GetMapping("/compare")
-    public ResponseEntity<Stock> getBetterStock(@RequestBody String titleFirstStock, String titleSecondStock) {
-        List<String> stocks = List.of(titleFirstStock, titleSecondStock);
+    @GetMapping("/compare/bazin")
+    public ResponseEntity<Stock> getBetterStockByBazinMethod(@RequestParam String title1, @RequestParam String title2) {
+        List<String> stocks = List.of(title1, title2);
         Stock betterStock = stockService.getBetterStockBazinMethod(stocks);
         return ResponseEntity.ok().body(betterStock);
     }
+
+    @GetMapping("/compare/graham")
+    public ResponseEntity<Stock> getBetterStockByGrahamMethod(@RequestParam String title1, @RequestParam String title2) {
+        List<String> stocks = List.of(title1, title2);
+        Stock betterStock = stockService.getBetterStockGrahamMethod(stocks);
+        return ResponseEntity.ok().body(betterStock);
+    }
+
 
     @PutMapping()
     public ResponseEntity<Stock> update(@RequestBody StockInputDTO stockData) {
