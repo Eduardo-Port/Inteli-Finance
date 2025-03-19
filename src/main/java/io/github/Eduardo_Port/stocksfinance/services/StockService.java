@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 @Service
@@ -106,8 +107,8 @@ public class StockService {
 
     public Stock getBetterStockBazinMethod(List<String> stocksToCompare) {
         List<Stock> stocks = this.stockRepository.findAllById(stocksToCompare);
-        Double bazinMethodValueFirstStock = getValueBazinMethod(stocks.get(0).getPrice(), stocks.get(0).getDividendYieldLast5Years());
-        Double bazinMethodvalueSecondStock = getValueBazinMethod(stocks.get(1).getPrice(), stocks.get(1).getDividendYieldLast5Years());
+        Double bazinMethodValueFirstStock = getValueBazinMethod(stocks.get(0).getTitle());
+        Double bazinMethodvalueSecondStock = getValueBazinMethod(stocks.get(1).getTitle());
         if (bazinMethodValueFirstStock > bazinMethodvalueSecondStock) {
             return stocks.get(0);
         } else if (bazinMethodValueFirstStock < bazinMethodvalueSecondStock) {
@@ -119,8 +120,8 @@ public class StockService {
 
     public Stock getBetterStockGrahamMethod(List<String> stocksToCompare) {
         List<Stock> stocks = this.stockRepository.findAllById(stocksToCompare);
-        Double grahamMethodValueFirstStock = getValueGrahamMethod(stocks.get(0).getProfit(), stocks.get(0).getPatrimonialValue());
-        Double grahamMethodValueSecondStock = getValueGrahamMethod(stocks.get(1).getProfit(), stocks.get(1).getPatrimonialValue());
+        Double grahamMethodValueFirstStock = getValueGrahamMethod(stocks.get(0).getTitle());
+        Double grahamMethodValueSecondStock = getValueGrahamMethod(stocks.get(1).getTitle());
         if(grahamMethodValueFirstStock > grahamMethodValueSecondStock) {
             return stocks.get(0);
         } else if (grahamMethodValueFirstStock < grahamMethodValueSecondStock) {
@@ -131,13 +132,19 @@ public class StockService {
     }
 
 
-    public Double getValueBazinMethod(Double price, Double dividendYield5Years) {
+    public Double getValueBazinMethod(String title) {
+        Stock stock = this.stockRepository.findById(title).orElseThrow(StockNotFoundException::new);
         double dividendYieldDesired = 10.0;
-        return (price * dividendYield5Years) / dividendYieldDesired;
+        DecimalFormat decimalFormat = new DecimalFormat("#,##");
+        Double value = (stock.getPrice() * stock.getDividendYieldLast5Years()) / dividendYieldDesired;
+        return Double.valueOf(decimalFormat.format(value));
     }
 
-    public Double getValueGrahamMethod(Double profit, Double patrimonialValue) {
+    public Double getValueGrahamMethod(String title) {
+        Stock stock = this.stockRepository.findById(title).orElseThrow(StockNotFoundException::new);
         double fixValue = 22.5;
-        return Math.sqrt(fixValue * profit * patrimonialValue);
+        Double value = Math.sqrt(fixValue * stock.getProfit() * stock.getPatrimonialValue());
+        DecimalFormat decimalFormat = new DecimalFormat("#,##");
+        return Double.valueOf(decimalFormat.format(value));
     }
 }

@@ -2,6 +2,7 @@ package io.github.Eduardo_Port.stocksfinance.controller;
 
 import io.github.Eduardo_Port.stocksfinance.domain.stock.Stock;
 import io.github.Eduardo_Port.stocksfinance.domain.stock.dto.StockInputDTO;
+import io.github.Eduardo_Port.stocksfinance.domain.stock.dto.StockOutputValueDTO;
 import io.github.Eduardo_Port.stocksfinance.services.StockService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -10,6 +11,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 @RestController
@@ -28,6 +30,28 @@ public class StockController {
     public ResponseEntity<Stock> insert(@RequestBody StockInputDTO stockData) {
         Stock newStock = this.stockService.insert(stockData);
         return ResponseEntity.ok().body(newStock);
+    }
+
+    @GetMapping("/graham-value")
+    public ResponseEntity<StockOutputValueDTO> getGrahamValue(@RequestParam("title") String title) {
+        Double grahamValue = this.stockService.getValueGrahamMethod(title);
+        Stock stock = this.stockService.getStockByTitle(title);
+        StockOutputValueDTO stockOutput = new StockOutputValueDTO(stock, grahamValue);
+        return ResponseEntity.ok().body(stockOutput);
+    }
+
+    @GetMapping("/bazin-value")
+    public ResponseEntity<StockOutputValueDTO> getBazinValue(@RequestParam("title") String title) {
+        Double grahamValue = this.stockService.getValueBazinMethod(title);
+        Stock stock = this.stockService.getStockByTitle(title);
+        StockOutputValueDTO stockOutput = new StockOutputValueDTO(stock, grahamValue);
+        return ResponseEntity.ok().body(stockOutput);
+    }
+
+    @PutMapping()
+    public ResponseEntity<Stock> update(@RequestBody StockInputDTO stockData) {
+        Stock updatedStock = this.stockService.update(stockData);
+        return ResponseEntity.ok().body(updatedStock);
     }
 
     @GetMapping()
@@ -55,13 +79,6 @@ public class StockController {
         List<String> stocks = List.of(title1, title2);
         Stock betterStock = stockService.getBetterStockGrahamMethod(stocks);
         return ResponseEntity.ok().body(betterStock);
-    }
-
-
-    @PutMapping()
-    public ResponseEntity<Stock> update(@RequestBody StockInputDTO stockData) {
-        Stock updatedStock = this.stockService.update(stockData);
-        return ResponseEntity.ok().body(updatedStock);
     }
 
     @DeleteMapping("/{title}")
