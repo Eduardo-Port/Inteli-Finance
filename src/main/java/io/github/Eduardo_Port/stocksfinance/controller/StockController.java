@@ -2,19 +2,16 @@ package io.github.Eduardo_Port.stocksfinance.controller;
 
 import io.github.Eduardo_Port.stocksfinance.domain.stock.Stock;
 import io.github.Eduardo_Port.stocksfinance.domain.stock.dto.StockInputDTO;
-import io.github.Eduardo_Port.stocksfinance.domain.stock.dto.StockUpdateInputDTO;
+import io.github.Eduardo_Port.stocksfinance.domain.stock.dto.StockOutputValueDTO;
 import io.github.Eduardo_Port.stocksfinance.services.StockService;
-import jakarta.websocket.server.PathParam;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 @RestController
@@ -35,6 +32,28 @@ public class StockController {
         return ResponseEntity.ok().body(newStock);
     }
 
+    @GetMapping("/graham-value")
+    public ResponseEntity<StockOutputValueDTO> getGrahamValue(@RequestParam("title") String title) {
+        Double grahamValue = this.stockService.getValueGrahamMethod(title);
+        Stock stock = this.stockService.getStockByTitle(title);
+        StockOutputValueDTO stockOutput = new StockOutputValueDTO(stock, grahamValue);
+        return ResponseEntity.ok().body(stockOutput);
+    }
+
+    @GetMapping("/bazin-value")
+    public ResponseEntity<StockOutputValueDTO> getBazinValue(@RequestParam("title") String title) {
+        Double grahamValue = this.stockService.getValueBazinMethod(title);
+        Stock stock = this.stockService.getStockByTitle(title);
+        StockOutputValueDTO stockOutput = new StockOutputValueDTO(stock, grahamValue);
+        return ResponseEntity.ok().body(stockOutput);
+    }
+
+    @PutMapping()
+    public ResponseEntity<Stock> update(@RequestBody StockInputDTO stockData) {
+        Stock updatedStock = this.stockService.update(stockData);
+        return ResponseEntity.ok().body(updatedStock);
+    }
+
     @GetMapping()
     public ResponseEntity<PagedModel<EntityModel<Stock>>> getStocksPaginated(@RequestParam(defaultValue = "0") int page) {
         Page<Stock> stocks = this.stockService.getStocksPaginated(page);
@@ -48,10 +67,18 @@ public class StockController {
         return ResponseEntity.ok().body(stock);
     }
 
-    @PutMapping()
-    public ResponseEntity<Stock> update(@RequestBody StockInputDTO stockData) {
-        Stock updatedStock = this.stockService.update(stockData);
-        return ResponseEntity.ok().body(updatedStock);
+    @GetMapping("/compare/bazin")
+    public ResponseEntity<Stock> getBetterStockByBazinMethod(@RequestParam String title1, @RequestParam String title2) {
+        List<String> stocks = List.of(title1, title2);
+        Stock betterStock = stockService.getBetterStockBazinMethod(stocks);
+        return ResponseEntity.ok().body(betterStock);
+    }
+
+    @GetMapping("/compare/graham")
+    public ResponseEntity<Stock> getBetterStockByGrahamMethod(@RequestParam String title1, @RequestParam String title2) {
+        List<String> stocks = List.of(title1, title2);
+        Stock betterStock = stockService.getBetterStockGrahamMethod(stocks);
+        return ResponseEntity.ok().body(betterStock);
     }
 
     @DeleteMapping("/{title}")
