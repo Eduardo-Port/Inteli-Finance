@@ -5,6 +5,7 @@ public record StockInputDTO(
         Double price,
         Double profit,
         Double pricePerPatrimonialValue,
+        Double patrimonialValue,
         Double dividendYield,
         Double dividendYieldLast5Years
 ) {
