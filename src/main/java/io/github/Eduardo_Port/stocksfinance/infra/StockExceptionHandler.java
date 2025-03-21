@@ -22,8 +22,8 @@ public class StockExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(StocksIsEqualException.class)
-    public ResponseEntity<String> stockStocksIsEqualException() {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Stocks have equal results.");
+    public ResponseEntity<String> stockStocksIsEqualException(StocksIsEqualException e) {
+        return ResponseEntity.status(HttpStatus.OK).body("Stocks have an equal result: " + e.getValuek());
     }
 
     @ExceptionHandler(RuntimeException.class)

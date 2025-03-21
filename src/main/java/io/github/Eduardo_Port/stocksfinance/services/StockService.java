@@ -123,7 +123,7 @@ public class StockService {
                     .withRel("Bazin valuation of this stock"));
             return stocks.get(1);
         } else {
-            throw new StocksIsEqualException();
+            throw new StocksIsEqualException(bazinMethodValueFirstStock);
         }
     }
 
@@ -145,7 +145,7 @@ public class StockService {
                     .withRel("Graham valuation of this stock"));
             return stocks.get(1);
         } else {
-            throw new StocksIsEqualException();
+            throw new StocksIsEqualException(grahamMethodValueFirstStock);
         }
     }
 
