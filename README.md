@@ -27,7 +27,7 @@
 <h3>Clonar</h3>
 
 ```bash
-git clone https://github.com/Eduardo-Port/Stocks-Finance.git
+git clone https://github.com/Eduardo-Port/Inteli-Finance.git
 ```
 
 <h3>Executar</h3>
@@ -35,7 +35,7 @@ git clone https://github.com/Eduardo-Port/Stocks-Finance.git
 1 - Entrar na pasta do projeto.
 
 ```bash
-cd Stocks-Finance
+cd Inteli-Finance
 ```
 
 2 - Instalar todas as dependências do projeto e iniciar a aplicação Spring Boot. 
@@ -205,7 +205,7 @@ mvnw spring-boot:run
 
 <h2 id="contribute">📫 Contribuições</h2>
 
-1. `git clone https://github.com/Eduardo-Port/Stocks-Finance.git`
+1. `git clone https://github.com/Eduardo-Port/Inteli-Finance.git`
 2. `git checkout -b feature/NAME`
 3. Siga patterns de commits
 4. Abra um Pull Request explicando os problemas resolvidos ou a atualização realizada, se existir, adicione prints das mudanças visuais e espere pelo review!
