@@ -3,10 +3,10 @@ package io.github.Eduardo_Port.stocksfinance.services;
 import io.github.Eduardo_Port.stocksfinance.controller.StockController;
 import io.github.Eduardo_Port.stocksfinance.domain.stock.Stock;
 import io.github.Eduardo_Port.stocksfinance.domain.stock.dto.StockInputDTO;
-
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import io.github.Eduardo_Port.stocksfinance.domain.stock.exceptions.RegisteredStockException;
 import io.github.Eduardo_Port.stocksfinance.domain.stock.exceptions.StockNotFoundException;
 import io.github.Eduardo_Port.stocksfinance.domain.stock.exceptions.StocksIsEqualException;
 import io.github.Eduardo_Port.stocksfinance.repositories.StockRepository;
@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.List;
@@ -28,6 +27,9 @@ public class StockService {
     }
 
     public Stock insert(StockInputDTO stockData) {
+        if (this.stockRepository.existsById(stockData.title())) {
+            throw new RegisteredStockException();
+        }
         Stock newStock = new Stock(stockData);
         this.stockRepository.save(newStock);
         newStock.add(linkTo(methodOn(StockController.class)
@@ -99,20 +101,26 @@ public class StockService {
     }
 
     public void deleteByTitle(String title) {
-        if (title == null || title.isEmpty()) {
-            throw new StockNotFoundException();
-        }
         Stock stock = this.stockRepository.findById(title).orElseThrow(StockNotFoundException::new);
         this.stockRepository.delete(stock);
     }
 
     public Stock getBetterStockBazinMethod(List<String> stocksToCompare) {
         List<Stock> stocks = this.stockRepository.findAllById(stocksToCompare);
+        if(stocks.size() != 2) {
+            throw new StockNotFoundException();
+        }
         Double bazinMethodValueFirstStock = getValueBazinMethod(stocks.get(0).getTitle());
         Double bazinMethodvalueSecondStock = getValueBazinMethod(stocks.get(1).getTitle());
         if (bazinMethodValueFirstStock > bazinMethodvalueSecondStock) {
+            stocks.get(0).add(linkTo(methodOn(StockController.class)
+                    .getBazinValue(stocks.get(0).getTitle()))
+                    .withRel("Bazin valuation of this stock"));
             return stocks.get(0);
         } else if (bazinMethodValueFirstStock < bazinMethodvalueSecondStock) {
+            stocks.get(1).add(linkTo(methodOn(StockController.class)
+                    .getGrahamValue(stocks.get(1).getTitle()))
+                    .withRel("Bazin valuation of this stock"));
             return stocks.get(1);
         } else {
             throw new StocksIsEqualException();
@@ -121,14 +129,23 @@ public class StockService {
 
     public Stock getBetterStockGrahamMethod(List<String> stocksToCompare) {
         List<Stock> stocks = this.stockRepository.findAllById(stocksToCompare);
+        if(stocks.size() != 2) {
+            throw new StockNotFoundException();
+        }
         Double grahamMethodValueFirstStock = getValueGrahamMethod(stocks.get(0).getTitle());
         Double grahamMethodValueSecondStock = getValueGrahamMethod(stocks.get(1).getTitle());
         if(grahamMethodValueFirstStock > grahamMethodValueSecondStock) {
+            stocks.get(0).add(linkTo(methodOn(StockController.class)
+                    .getGrahamValue(stocks.get(0).getTitle()))
+                    .withRel("Graham valuation of this stock"));
             return stocks.get(0);
         } else if (grahamMethodValueFirstStock < grahamMethodValueSecondStock) {
-            throw new StocksIsEqualException();
-        } else {
+            stocks.get(1).add(linkTo(methodOn(StockController.class)
+                    .getGrahamValue(stocks.get(1).getTitle()))
+                    .withRel("Graham valuation of this stock"));
             return stocks.get(1);
+        } else {
+            throw new StocksIsEqualException();
         }
     }
 
@@ -142,7 +159,7 @@ public class StockService {
         try {
             return decimalFormat.parse(formattedValue).doubleValue();
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException();
         }
     }
 

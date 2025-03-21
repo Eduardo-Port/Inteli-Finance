@@ -8,10 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.text.DecimalFormat;
 import java.util.List;
 
 @RestController
@@ -29,7 +28,7 @@ public class StockController {
     @PostMapping
     public ResponseEntity<Stock> insert(@RequestBody StockInputDTO stockData) {
         Stock newStock = this.stockService.insert(stockData);
-        return ResponseEntity.ok().body(newStock);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newStock);
     }
 
     @GetMapping("/graham-value")
@@ -90,6 +89,4 @@ public class StockController {
         }
         return ResponseEntity.noContent().build();
     }
-
-
 }
