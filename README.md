@@ -1,4 +1,4 @@
-<h1 align="center" style="font-weight: bold;">Stocks Finance 💻</h1>
+<h1 align="center" style="font-weight: bold;">Inteli Finance 💻</h1>
 
 <p align="center">
  <a href="#tech">Tecnologias</a> • 
@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-    <b>Stocks Finance é uma API que auxilia na análise e escolha de ativos do mercado de ações Brasileiro.</b>
+    <b>Inteli Finance é uma API que auxilia na análise e escolha de ativos do mercado de ações Brasileiro.</b>
 </p>
 
 <h2 id="technologies">💻 Tecnologias</h2>
