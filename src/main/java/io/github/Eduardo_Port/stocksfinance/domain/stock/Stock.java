@@ -9,6 +9,7 @@ import org.springframework.hateoas.RepresentationModel;
 @Document(collection = "stocks")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Stock extends RepresentationModel<Stock> {
     @Id
     private String title;
@@ -18,10 +19,6 @@ public class Stock extends RepresentationModel<Stock> {
     private Double patrimonialValue;
     private Double dividendYield;
     private Double dividendYieldLast5Years;
-
-    public Stock() {
-
-    }
 
     public Stock(StockInputDTO stockData) {
         this.title= stockData.title();
