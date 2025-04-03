@@ -45,10 +45,14 @@ mvnw spring-boot:run
 
 <h2 id="routes">📍 API Endpoints</h2>
 ​
-| rota               | descrição                                     
+| rota               | descrição            
+
 | <kbd>GET /api/stocks</kbd>     | retorna todas as ações registradas [detalhes da resposta](#get-all-detail)
+
 | <kbd>GET /api/stocks/?title={title}</kbd>     | retorna as informações de uma ação específica [detalhes da resposta](#get-one-detail)
+
 | <kbd>POST /api/stocks</kbd>     | authenticate user into the api see [detalhes da resposta](#post-detail)
+
 | <kbd>PUT /api/stocks</kbd>     | authenticate user into the api see [detalhes da resposta](#post-detail)
 
 <h3 id="get-all-detail">GET /api/stocks</h3>
